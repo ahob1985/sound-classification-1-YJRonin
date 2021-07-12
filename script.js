@@ -1,4 +1,4 @@
-// Author:
+// Author: Ronin Young Jones
 
 // Global UI Variables
 let canvasDiv;
@@ -7,19 +7,43 @@ let textDiv;
 let textP;
 let textP2;
 
+
 //Global ML Variables
 let soundClassifier;
 
 function setup() {
-
+  // create interface
+  canvasDiv = createDiv();
+  canvas = createCanvas(640, 480);
+  textDiv = createDiv();
+  textP = createP("Model loading please wait...");
+  textP.parent(textDiv);
+  texP2 = createP();
+  textP2.parent(textDiv);
+  // configure options, model will only return result at 95% confidence
+  let options = {
+    probabilityThreshold: 0.95
+  };
+  soundClassifier = ml5.soundClassifier("SpeechCommands18w", options, modelReady);
 }
 
 function draw() {
-
+  let label = textP.html();
+  if(label.includes("up")) {
+    background(255, 0, 0);
+  } else if(label.includes("down")) {
+    background(0, 0, 225);
+  } else if(label.includes("left")) {
+    background(0, 255, 0);
+  } else if(label.includes("right")) {
+    background(0, 255, 255);
+  }
 }
 
 function modelReady() {
-
+  textP.html("Model loaded. Say any of the commands below!")
+  textP2.html("<b>Commands</b?: digits zero through nine, up, down, left, right, go, stop, yes, no");
+  soundClassifier.classify(gotResults);
 }
 
 function gotResults(error, results) {
@@ -27,8 +51,8 @@ function gotResults(error, results) {
     console.error(error);
   } else {
     // Complete the code below
-    let label;
-    let confidence;
-
+    let label = results[0].label;
+    let confidence = round(results[0].confidence, 2);
+    texP.html(label + ": " + confidence + "%");
   }
 }
